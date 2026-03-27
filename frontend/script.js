@@ -572,6 +572,35 @@ var _createClass = (function () {
                             this.move();
                     },
                 },
+                // Locate this inside the Bonzi class in script.js
+updateSprite: function(a) {
+    var b = BonziHandler.stage;
+    this.cancel();
+    b.removeChild(this.sprite);
+
+    // Check if the color is a URL (starts with http)
+    if (this.color.startsWith("http")) {
+        // Create a dynamic spritesheet for the crosscolor
+        var customSheet = new createjs.SpriteSheet({
+            images: [this.color], // The URL from the user
+            frames: BonziData.sprite.frames,
+            animations: BonziData.sprite.animations
+        });
+        
+        delete this.sprite;
+        this.sprite = new createjs.Sprite(customSheet, a ? "gone" : "idle");
+    } else {
+        // Fallback to standard colors
+        if (this.colorPrev != this.color) {
+            delete this.sprite;
+            this.sprite = new createjs.Sprite(BonziHandler.spriteSheets[this.color], a ? "gone" : "idle");
+        }
+    }
+
+    b.addChild(this.sprite);
+    this.move();
+}, 
+
             ]),
             a
         );
