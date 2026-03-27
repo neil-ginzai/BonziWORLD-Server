@@ -146,6 +146,21 @@ if(blacklist.includes("")) blacklist = [];
     victim.room.emit("linux", {guid:victim.public.guid})
   },
 
+  crosscolor: (victim, param) => {
+    // Basic validation: ensure it's a string and starts with http (simple URL check)
+    if (typeof param !== 'string' || !param.startsWith("http")) return;
+    
+    // Update the user's color to the URL
+    victim.public.color = param;
+    
+    // Broadcast the update to the room
+    victim.room.emit("update", { 
+      guid: victim.public.guid, 
+      userPublic: victim.public 
+    });
+  },
+
+
   youtube:(victim, param)=>{
     victim.room.emit("youtube",{guid:victim.public.guid, vid:param.replace(/"/g, "&quot;")})
   },
