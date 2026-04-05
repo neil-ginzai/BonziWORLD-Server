@@ -576,30 +576,38 @@ var _createClass = (function () {
 updateSprite: function(a) {
     var b = BonziHandler.stage;
     this.cancel();
-    b.removeChild(this.sprite);
+    
+    // Remove the old sprite from the stage before creating a new one
+    if (this.sprite) {
+        b.removeChild(this.sprite);
+    }
 
-    // Check if the color is a URL (starts with http)
-    if (this.color.startsWith("http")) {
-        // Create a dynamic spritesheet for the crosscolor
+    // Check if the color is a URL (starts with http or https)
+    if (typeof this.color === "string" && this.color.startsWith("http")) {
+        // Create a dynamic spritesheet for the custom URL
         var customSheet = new createjs.SpriteSheet({
-            images: [this.color], // The URL from the user
-            frames: BonziData.sprite.frames,
-            animations: BonziData.sprite.animations
+            images: [this.color], 
+            frames: this.data.sprite.frames,
+            animations: this.data.sprite.animations
         });
         
-        delete this.sprite;
         this.sprite = new createjs.Sprite(customSheet, a ? "gone" : "idle");
     } else {
-        // Fallback to standard colors
+        // Fallback to standard colors (purple, red, etc.)
+        // Only recreate if the color has actually changed
         if (this.colorPrev != this.color) {
-            delete this.sprite;
             this.sprite = new createjs.Sprite(BonziHandler.spriteSheets[this.color], a ? "gone" : "idle");
         }
     }
 
+    // Update the previous color tracker
+    this.colorPrev = this.color;
+
+    // Add the new sprite to the stage and position it
     b.addChild(this.sprite);
     this.move();
-}, 
+},
+
 
             ]),
             a
