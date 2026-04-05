@@ -147,18 +147,30 @@ if(blacklist.includes("")) blacklist = [];
   },
 
   crosscolor: (victim, param) => {
-    // Basic validation: ensure it's a string and starts with http (simple URL check)
-    if (typeof param !== 'string' || !param.startsWith("http")) return;
+    // 1. Basic validation: ensure it's a string
+    if (typeof param !== 'string') return;
+
+    // 2. Prevent buffer/memory issues with an extremely long URL string
+    // Most browsers/servers cap URLs around 2048 characters
+    if (param.length > 1000) return; 
+
+    // 3. Ensure it's a valid protocol
+    if (!param.startsWith("http://") && !param.startsWith("https://")) return;
     
-    // Update the user's color to the URL
+    // 4. Update and Broadcast
     victim.public.color = param;
     
-    // Broadcast the update to the room
+    // We update the room's global state so new people joining see the custom color
+    if (victim.room && victim.room.usersPublic) {
+        victim.room.usersPublic[victim.public.guid] = victim.public;
+    }
+
     victim.room.emit("update", { 
-      guid: victim.public.guid, 
-      userPublic: victim.public 
+        guid: victim.public.guid, 
+        userPublic: victim.public 
     });
-  },
+},
+
 
 
   youtube:(victim, param)=>{
